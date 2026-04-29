@@ -65,7 +65,7 @@
   (send dc clear)
   (send dc set-pen
           my-pen)
-  (for ([x WIDTH])
+  (for ([x (in-range (- WIDTH) WIDTH)])
     (let* ([y (* 20.0(sin (degrees->radians x)))]
            [xy (projection x y 1.0 WIDTH HEIGHT)])
       (send dc draw-point (vector-ref xy 0) (vector-ref xy 1)))))
