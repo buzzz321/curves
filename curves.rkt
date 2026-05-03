@@ -64,16 +64,37 @@
 (define (paint canvas dc)
   (send dc clear)
   (send dc set-pen
-          my-pen)
+        my-pen)
   (for ([x (in-range (- WIDTH) WIDTH)])
     (let* ([y (* 20.0(sin (degrees->radians x)))]
            [xy (projection x y 1.0 WIDTH HEIGHT)])
       (send dc draw-point (vector-ref xy 0) (vector-ref xy 1)))))
 
-(define frame (new frame% [label "Animation"] [width WIDTH] [height HEIGHT]))
-(define canvas (new canvas% [parent frame] [paint-callback paint]))
+;; Sadly we need to subclass fram or canvas to be able to get custom handler for keyboard
+;; I guess that is due it uses wxwindows under the hood
+(define my-frame%
+  (class frame%
+    (super-new)
+    
+    ;; Override on-subwindow-char    
+    (define/override (on-subwindow-char receiver event)
+      (let ([key-char (send event get-key-code)])
+        (cond
+          [(eqv? key-char #\a) (displayln "String A pressed") #t] ; Return #t to swallow the event
+          [(eqv? key-char #\s) (displayln "String S pressed") #t]
+          [(eqv? key-char #\q) (send this show #f) #t]
+          [(eqv? key-char 'escape) (send this show #f) #t]
+          
+          ;; If it's not a guitar key, return #f to let the event pass through normally
+          [else #f])))))
 
+(define frame (new my-frame% [label "Animation"] [width WIDTH] [height HEIGHT]))
 
+(define mycanvas (new canvas%
+                    [parent frame]
+                    [paint-callback paint]
+                   ))
+                    
 (define timer (new timer% [notify-callback
                            (lambda ()
                              ;(set! x (add1 x))
@@ -81,12 +102,13 @@
                              (set! angleXspeed (* angleX deltaTime))
                              (set! angleYspeed (* angleY deltaTime))
                              ;(printf "~a\n" (current-milliseconds))
-                             (send canvas refresh)
+                             (send mycanvas refresh)
                              ;(send timer start 16)
                              )]
                    [interval #f]
                    [just-once? #f]
                    ))
-(send frame show #t)
-(send timer start 16) ; ~60 FPS in best case i guess...
 
+(send frame show #t)
+(send mycanvas focus)
+(send timer start 16) ; ~60 FPS in best case i guess...
