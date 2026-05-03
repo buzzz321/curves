@@ -80,9 +80,7 @@
     (define/override (on-subwindow-char receiver event)
       (let ([key-char (send event get-key-code)])
         (cond
-          [(eqv? key-char #\a) (displayln "String A pressed") #t] ; Return #t to swallow the event
-          [(eqv? key-char #\s) (displayln "String S pressed") #t]
-          [(eqv? key-char #\q) (send this show #f) #t]
+          [(eqv? key-char #\q) (send this show #f) #t] ; Return #t to swallow the event
           [(eqv? key-char 'escape) (send this show #f) #t]
           
           ;; If it's not a guitar key, return #f to let the event pass through normally
