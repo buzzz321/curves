@@ -83,7 +83,7 @@
           [(eqv? key-char #\q) (send this show #f) #t] ; Return #t to swallow the event
           [(eqv? key-char 'escape) (send this show #f) #t]
           
-          ;; If it's not a guitar key, return #f to let the event pass through normally
+          ;; If it's not a key we want, return #f to let the event pass through normally
           [else #f])))))
 
 (define frame (new my-frame% [label "Animation"] [width WIDTH] [height HEIGHT]))
